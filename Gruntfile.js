@@ -119,19 +119,23 @@ module.exports = function(grunt) {
 
   grunt.registerTask('json:svg', 'add svg string to data.json build', function() {
     var files = fs.readdirSync("./build/svg/")
-    var data = JSON.parse(fs.readFileSync("./lib/data.json"))
+    var dataIn = JSON.parse(fs.readFileSync("./lib/data.json"))
+    var dataOut = {}
 
     files.forEach(function(file) {
       var svg = fs.readFileSync(path.resolve("./build/svg", file))
       var key = path.basename(file, ".svg")
-      if (data[key]) {
+
+      if (dataIn[key]) {
+        dataOut[key] = dataIn[key]
+
         var raw = svg.toString()
-        data[key].path = /<path.+\/>/g.exec(raw)[0]
-        data[key].height = /height="(\d+)"/g.exec(raw)[1]
-        data[key].width = /width="(\d+)"/g.exec(raw)[1]
+        dataOut[key].path = /<path.+\/>/g.exec(raw)[0]
+        dataOut[key].height = /height="(\d+)"/g.exec(raw)[1]
+        dataOut[key].width = /width="(\d+)"/g.exec(raw)[1]
       }
     })
 
-    fs.writeFileSync("build/data.json", JSON.stringify(data));
+    fs.writeFileSync("build/data.json", JSON.stringify(dataOut));
   })
 };
